@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import template from 'lodash.template'
 import styled from 'styled-components'
 import { PlayType } from '../enums'
@@ -8,6 +8,7 @@ import { Board } from './Board'
 import { Message } from './Message'
 import { Intro } from './Intro'
 import { Button } from './Button'
+import { ButtonStateType } from '../redux/reducers/button'
 
 const Wrap = styled.div`
   max-width: 1280px;
@@ -22,17 +23,23 @@ const ButtonWrap = styled.div`
   width: 100%;
   justify-content: center;
 `
-type ButtonProps = {
-  isVisible: boolean
-  text: string
-  onClick: () => unknown
-}
 
-type TicTacToeProps = {
+type Props = {
   numberOfColumns: number
 }
 
-const TicTacToe: FC<TicTacToeProps> = ({ numberOfColumns }) => {
+type ReduxProps = {
+  buttonState: ButtonStateType
+  setButtonState: (buttonState: ButtonStateType) => void
+}
+
+type TicTacToeProps = Props & ReduxProps
+
+const TicTacToe: FC<TicTacToeProps> = ({
+  numberOfColumns,
+  buttonState,
+  setButtonState,
+}) => {
   const [isIntroScreenActive, setIsIntroScreenActive] = useState<boolean>(true)
   const [board, setBoard] = useState<PlayType[]>(
     Array(numberOfColumns ** 2).fill(PlayType.empty),
@@ -42,21 +49,37 @@ const TicTacToe: FC<TicTacToeProps> = ({ numberOfColumns }) => {
     template(GAME_MESSAGES.nextTurn)({ player }),
   )
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setBoard(Array(numberOfColumns ** 2).fill(PlayType.empty))
     setPlayer(PlayType.x)
     setIsIntroScreenActive(false)
     setMessage(template(GAME_MESSAGES.nextTurn)({ player }))
-    setButtonProps({ ...buttonProps, isVisible: false })
-  }
+    setButtonState({ ...buttonState, isVisible: false })
+  }, [
+    setBoard,
+    setPlayer,
+    setIsIntroScreenActive,
+    setMessage,
+    buttonState,
+    numberOfColumns,
+    player,
+    setButtonState,
+  ])
 
-  const [buttonProps, setButtonProps] = useState<ButtonProps>({
-    isVisible: true,
-    text: GAME_MESSAGES.startButton,
-    onClick: resetGame,
-  })
+  const showRestartGameButton = useCallback(() => {
+    setButtonState({
+      ...buttonState,
+      isVisible: true,
+      text: GAME_MESSAGES.restartButton,
+    })
+  }, [setButtonState, buttonState])
 
-  const handleInput = (position: number): void => {
+  useEffect(() => {
+    // Run this effect only once to initialize to make sure we initialize the start button
+    setButtonState({ ...buttonState, isVisible: true, onClick: resetGame })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSquareClick = (position: number): void => {
     if (player === PlayType.empty || board[position] !== PlayType.empty) {
       // The player can't do anything when player is 'empty' because that means that someone won or it was a draw
       // Also when the player click in a square that is already occupied, we shouldn't do anything
@@ -70,11 +93,7 @@ const TicTacToe: FC<TicTacToeProps> = ({ numberOfColumns }) => {
     if (calculateDidSomeoneWin(boardCopy)) {
       setMessage(template(GAME_MESSAGES.win)({ player }))
       setPlayer(PlayType.empty)
-      setButtonProps({
-        ...buttonProps,
-        isVisible: true,
-        text: GAME_MESSAGES.restartButton,
-      })
+      showRestartGameButton()
       return
     }
 
@@ -82,11 +101,7 @@ const TicTacToe: FC<TicTacToeProps> = ({ numberOfColumns }) => {
     if (boardCopy.indexOf(PlayType.empty) === -1) {
       setMessage(GAME_MESSAGES.draw)
       setPlayer(PlayType.empty)
-      setButtonProps({
-        ...buttonProps,
-        isVisible: true,
-        text: GAME_MESSAGES.restartButton,
-      })
+      showRestartGameButton()
     } else {
       const nextPlayer = player === PlayType.x ? PlayType.o : PlayType.x
       setPlayer(nextPlayer)
@@ -102,15 +117,15 @@ const TicTacToe: FC<TicTacToeProps> = ({ numberOfColumns }) => {
         <>
           <Board
             board={board}
-            onClick={handleInput}
+            onClick={handleSquareClick}
             numberOfColumns={numberOfColumns}
           />
           <Message>{message}</Message>
         </>
       )}
-      {buttonProps.isVisible && (
+      {buttonState.isVisible && (
         <ButtonWrap>
-          <Button onClick={buttonProps.onClick}>{buttonProps.text}</Button>
+          <Button onClick={buttonState.onClick}>{buttonState.text}</Button>
         </ButtonWrap>
       )}
     </Wrap>
