@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useEffect, useState } from 'react'
-import template from 'lodash.template'
 import styled from 'styled-components'
 import { PlayType } from '../enums'
 import { GAME_MESSAGES } from '../messages'
@@ -9,6 +8,8 @@ import { Message } from './Message'
 import { Intro } from './Intro'
 import { Button } from './Button'
 import { ButtonStateType } from '../redux/reducers/button'
+// Importing using require to fix issue with failing test in jest
+const template = require('lodash.template')
 
 const Wrap = styled.div`
   max-width: 1280px;
@@ -76,7 +77,7 @@ const TicTacToe: FC<TicTacToeProps> = ({
 
   useEffect(() => {
     // Run this effect only once to initialize to make sure we initialize the start button
-    setButtonState({ ...buttonState, isVisible: true, onClick: resetGame })
+    setButtonState({ ...buttonState, isVisible: true })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSquareClick = (position: number): void => {
@@ -125,7 +126,7 @@ const TicTacToe: FC<TicTacToeProps> = ({
       )}
       {buttonState.isVisible && (
         <ButtonWrap>
-          <Button onClick={buttonState.onClick}>{buttonState.text}</Button>
+          <Button onClick={resetGame}>{buttonState.text}</Button>
         </ButtonWrap>
       )}
     </Wrap>

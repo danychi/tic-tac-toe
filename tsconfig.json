@@ -6,11 +6,13 @@
         "strict": true,
         "noImplicitReturns": true,
         "noImplicitAny": true,
-        "module": "es6",
         "moduleResolution": "node",
         "target": "es5",
         "allowJs": true,
         "jsx": "react",
+        "lib": ["dom", "esnext"],
+        "module": "esnext",
+        "esModuleInterop": true
     },
     "include": [
         "./src/**/*"

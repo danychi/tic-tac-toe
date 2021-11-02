@@ -5,16 +5,15 @@ import { Action } from '../types'
 type ButtonStateType = {
   readonly isVisible: boolean
   readonly text: string
-  readonly onClick?: () => unknown
 }
 
-const initialState: ButtonStateType = {
+const buttonInitialState: ButtonStateType = {
   isVisible: true,
   text: GAME_MESSAGES.startButton,
 }
 
 const buttonReducer = (
-  state = initialState,
+  state = buttonInitialState,
   action: Action<ButtonStateType>,
 ): ButtonStateType => {
   switch (action.type) {
@@ -28,4 +27,4 @@ const buttonReducer = (
   }
 }
 
-export { ButtonStateType, buttonReducer }
+export { ButtonStateType, buttonReducer, buttonInitialState }

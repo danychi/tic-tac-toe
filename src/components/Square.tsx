@@ -6,6 +6,7 @@ import { PlayType } from '../enums'
 type Props = {
   value: PlayType
   onClick: () => void
+  testId: string
 }
 
 const StyledButton = styled.button`
@@ -18,8 +19,10 @@ const StyledButton = styled.button`
   font-weight: bold;
 `
 
-const Square: FC<Props> = ({ value, onClick }) => (
-  <StyledButton onClick={onClick}>{value}</StyledButton>
+const Square: FC<Props> = ({ value, onClick, testId }) => (
+  <StyledButton onClick={onClick} data-testid={testId}>
+    {value}
+  </StyledButton>
 )
 
 export { Square }

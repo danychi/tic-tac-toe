@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { COLORS } from '../constants'
 
-const Message = styled.h2`
+const Message = styled.h3`
   width: 100%;
   margin: 0 auto;
   display: flex;

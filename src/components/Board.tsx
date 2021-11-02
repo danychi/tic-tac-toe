@@ -36,6 +36,7 @@ const Board: FC<BoardProps> = ({ board, onClick, numberOfColumns }) => (
           key={position}
           value={board[position]}
           onClick={() => onClick(position)}
+          testId={`square${position}`}
         />
       ))}
     </Grid>

@@ -16,10 +16,10 @@ const Wrap = styled.div`
   margin: 0 auto 20px;
 `
 
-const Title = styled.h3`
+const Title = styled.h2`
   font-size: 24px;
 `
-const Subtitle = styled.h4`
+const Subtitle = styled.h3`
   font-size: 20px;
 `
 
